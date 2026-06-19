@@ -1,9 +1,11 @@
 <script lang="ts">
 	import { resolve } from '$app/paths';
+	import { History } from 'lucide-svelte';
 	import GitHubIcon from '$lib/components/icons/GitHubIcon.svelte';
 	import Lightswitch from './Lightswitch.svelte';
 	import ThemeSwitch from './ThemeSwitch.svelte';
 	import Logo from '../icons/Logo.svelte';
+	import { historyStore } from '$lib/stores/history.svelte';
 </script>
 
 <header
@@ -25,6 +27,13 @@
 			<ThemeSwitch />
 			<span class="border-r border-surface-200-800"></span>
 			<nav class="flex items-center gap-1">
+				<button
+					class="btn-icon hover:preset-tonal"
+					onclick={() => (historyStore.open = true)}
+					aria-label="History"
+				>
+					<History size={20} />
+				</button>
 				<a
 					class="btn-icon hover:preset-tonal"
 					href="https://github.com/mistahuman/forge-string"

@@ -1,45 +1,78 @@
 <script lang="ts">
-	import { Menu, X } from 'lucide-svelte';
-	import type { ResolvedPathname } from '$app/types';
+	import { X, Copy, Check } from 'lucide-svelte';
+	import { historyStore } from '$lib/stores/history.svelte';
 
-	interface NavLink {
-		href: ResolvedPathname;
-		label: string;
-		target?: string;
-	}
+	let copiedId = $state<number | null>(null);
 
-	let { title = '', navigation = [] }: { title: string; navigation?: NavLink[] } = $props();
-	let open = $state(false);
-
-	function toggle() {
-		open = !open;
+	async function copyEntry(entry: { id: number; output: string }) {
+		await navigator.clipboard.writeText(entry.output);
+		copiedId = entry.id;
+		setTimeout(() => (copiedId = null), 2000);
 	}
 </script>
 
-<!-- Hamburger Menu -->
-<button class="btn-icon xl:hidden" onclick={toggle}>
-	<Menu size={20} />
-</button>
+<!-- Backdrop -->
+{#if historyStore.open}
+	<div
+		class="fixed inset-0 z-40 bg-black/40"
+		role="presentation"
+		onclick={() => (historyStore.open = false)}
+	></div>
+{/if}
 
-<!-- Drawer Panel -->
+<!-- Panel -->
 <div
-	class="fixed top-0 bottom-0 left-0 z-50 h-screen w-[320px] space-y-10 overflow-y-auto preset-filled-surface-100-900 p-4 pb-24 shadow-xl transition-transform duration-100 xl:hidden"
-	class:-translate-x-[320px]={!open}
-	class:translate-x-0={open}
+	class="fixed top-0 right-0 bottom-0 z-50 h-screen w-[360px] overflow-y-auto preset-filled-surface-100-900 shadow-xl transition-transform duration-200"
+	class:translate-x-[360px]={!historyStore.open}
+	class:translate-x-0={historyStore.open}
 >
-	<!-- Header -->
-	<header class="flex items-center justify-between">
-		<h2 class="h3">{title}</h2>
-		<button class="btn-icon" onclick={toggle}>
-			<X size={20} />
-		</button>
+	<header class="flex items-center justify-between border-b border-surface-200-800 px-4 py-3">
+		<div class="flex items-center gap-2">
+			<span class="font-medium">History</span>
+			{#if historyStore.entries.length > 0}
+				<span class="badge preset-tonal-surface text-xs">{historyStore.entries.length}</span>
+			{/if}
+		</div>
+		<div class="flex items-center gap-1">
+			{#if historyStore.entries.length > 0}
+				<button onclick={() => historyStore.clear()} class="btn btn-sm preset-tonal text-xs">
+					Clear
+				</button>
+			{/if}
+			<button class="btn-icon" onclick={() => (historyStore.open = false)}>
+				<X size={18} />
+			</button>
+		</div>
 	</header>
-	<!-- Navigation -->
-	<nav class="flex flex-col gap-2">
-		{#each navigation as link (link.href)}
-			<a class="anchor hover:underline" href={link.href} target={link.target} onclick={toggle}>
-				{link.label}
-			</a>
-		{/each}
-	</nav>
+
+	<div class="divide-y divide-surface-200-800">
+		{#if historyStore.entries.length === 0}
+			<p class="px-4 py-8 text-center text-sm text-surface-500-400">No history yet.</p>
+		{:else}
+			{#each historyStore.entries as entry (entry.id)}
+				<div class="flex items-center gap-3 px-4 py-3">
+					<div class="min-w-0 flex-1 space-y-1">
+						<p class="truncate font-mono text-sm">{entry.output}</p>
+						<div class="flex items-center gap-1.5">
+							<span class="badge preset-tonal-surface text-xs">{entry.operatorLabel}</span>
+							<span class="badge preset-outlined text-xs">
+								{entry.tokenCount} token{entry.tokenCount !== 1 ? 's' : ''}
+							</span>
+						</div>
+					</div>
+					<button
+						onclick={() => copyEntry(entry)}
+						class="btn-icon btn-sm preset-tonal shrink-0"
+						aria-label="Copy"
+					>
+						{#if copiedId === entry.id}
+							<Check size={14} />
+						{:else}
+							<Copy size={14} />
+						{/if}
+					</button>
+				</div>
+			{/each}
+		{/if}
+	</div>
 </div>

@@ -2,6 +2,7 @@
 	import './layout.css';
 	import Header from '$lib/components/generic/Header.svelte';
 	import Footer from '$lib/components/generic/Footer.svelte';
+	import Drawer from '$lib/components/generic/Drawer.svelte';
 	import { uiStore } from '$lib/stores/ui.svelte';
 
 	let { children } = $props();
@@ -20,6 +21,8 @@
 	</main>
 	<Footer />
 </div>
+
+<Drawer />
 
 <!-- Toast overlay -->
 <div class="pointer-events-none fixed bottom-6 right-6 z-50 flex flex-col gap-2">
