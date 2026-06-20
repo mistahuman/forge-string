@@ -69,7 +69,7 @@
 	<div class="space-y-3">
 		<p class="text-xs font-semibold uppercase tracking-widest text-surface-500-400">Join with</p>
 		<div
-			class="flex gap-1 rounded-container bg-surface-200-800 p-1"
+			class="flex gap-1 overflow-hidden rounded-container bg-surface-200-800 p-1"
 			role="group"
 			aria-label="Join operator"
 		>
@@ -125,15 +125,10 @@
 				{/if}
 			</button>
 		</div>
-		<textarea
-			readonly
-			rows="5"
-			value={output}
-			placeholder="Output will appear here as you type…"
-			spellcheck="false"
-			class="w-full resize-none bg-transparent p-4 font-mono text-sm
-				text-surface-900-50 placeholder:text-surface-400-600 focus-visible:outline-none"
-		></textarea>
+		<pre
+			class="m-0 min-h-32 w-full overflow-x-auto whitespace-pre-wrap break-all p-4 font-mono text-sm
+				{output ? 'text-surface-900-50' : 'text-surface-400-600'}"
+		>{output || 'Output will appear here as you type…'}</pre>
 	</div>
 
 </div>
